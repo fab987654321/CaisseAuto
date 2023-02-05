@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class Caisse {
@@ -87,6 +86,12 @@ public class Noeud{
         return ret;
 
     }
+
+    /**Ajoute un noeud au rejeté pour avoir une trace*/
+    public void addRejet(Noeud noeudEnfant){
+        this.dejaTeste.add(noeudEnfant);
+    }
+
     Noeud(Espece e){this.esp = e; ;}
 
 }
@@ -102,18 +107,46 @@ Caisse(){
     lesSous.add(new Piece2(0));
 }
     public void decoupageMonnaie(double aDecouper){
-    Noeud actuel;
-    boolean looping = true;
+    //ListeChaîné
+    Noeud noeuds;
+
+    //Info fonction de la situation
     int tailleListe = lesSous.size();
-    int nbEspece = getQte();
-    double tempo = aDecouper;
-        //Boucle sur la lg max d'une branche0
+    int nbEspece = getTotalQte();
+
+    //Variables temporaire qui varient bcp
+    int choisie;
+    double valeurRestante = aDecouper;
+
+        //FIXME n'ira pas forcément a la fin de la branche car il y a dépilage transfoermer en while ?
+        //Boucle sur la longueur max d'une branche
         for (int i = 0; i < nbEspece; i++) {
         //Boucle sur les possibilités
         for (int j = 0; j < tailleListe; j++) {
-            //Si valeurRestante - choisie < 0 alors on quite et on marque comme rejeté
-            //Si choisie plus en quantité suffisante alors on rejete
-            //Attention si le premier est dépilé alors ce pb est non solvable avec nos éta actuel
+            //TODO avec la linkedList.get() ou un truc du genre
+            //Si déjà rejeté on passe à une autre sous banche
+            if (false)continue;
+
+            //Recup valeur de notre potentiel piece/billet
+            choisie = lesSous.get(j).getValeur();
+
+            //Si valeurRestante - choisie < 0 alors on quite et on marque comme rejeté 
+            if (valeurRestante - choisie < 0) {
+                //Marquer comme rejeté
+                //Dépiler de la liste chaîné
+            }
+            //Si valeurRestante - choisie > 0 et pas de possibilité en suite car pas de disponible alors on quite et on marque comme rejeté
+            if(false){
+                //TODO a voir si ça se fait pas lors de la prochaine boucle
+            }
+            //Si espece choisie plus en quantité suffisante alors on rejete
+            if(false){
+                //A voir si on fusionne pas avec un autre if a par pour mettre des msg d'erreur
+            }
+            //Attention si le premier est dépilé alors ce pb est non solvable avec notre état actuel
+            if(false){
+                //SI la linkedList est vide alors ya pas de solution donc on retourne une erreur
+            }
             //TODO liste chaîné avec les élément Espece, lorsque l'on est bloqué dans la branche on recule d'un cran en se souvenant du pressédent résultat pour prendre une valeur plus à droite (plus faible)
             // et si tt est utilisé on remonte d'un cran et idem jusqu'à trouvé une solution ou bien jusqu'à arrivé sur un non solvable
             }
@@ -134,7 +167,7 @@ Caisse(){
     return ret;
     }
 
-    public int getQte(){
+    public int getTotalQte(){
         int ret = 0;
         for (Espece t:lesSous)
             ret += t.getQt();
