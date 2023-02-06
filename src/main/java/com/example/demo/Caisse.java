@@ -1,18 +1,16 @@
 package com.example.demo;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
-public class Caisse {
+public class Caisse extends Thread{
 
 public static abstract class Espece{
-    private int valeur;
+    private double valeur;
     private String description;
     private int qt;
 
     //Setters
-    public void setValeur(int valeur) {
+    public void setValeur(double valeur) {
         this.valeur = valeur;
     }
     public void setDescription(String description) {
@@ -22,7 +20,7 @@ public static abstract class Espece{
         this.qt = qt;
     }
     //Getters
-    public int getValeur() {
+    public double getValeur() {
         return valeur;
     }
     public int getQt() {
@@ -32,7 +30,7 @@ public static abstract class Espece{
         return description;
     }
     //Constructeur
-    Espece(int val,String des,int quantite){
+    Espece(double val,String des,int quantite){
         valeur = val;
         description = des;
         qt = quantite;
@@ -50,31 +48,119 @@ public static abstract class Espece{
             this.qt -= quantitee;
     }
 }
-public static class Piece2 extends Espece{
+    public static class Cent1 extends Espece{
 
+        Cent1(){
+            super(0.01,"Piece de 0.01€",1);
+        }
+        Cent1(int qt){
+            super(0.01,"Piece de 0.01€",qt);
+        }
+    }
+    public static class Cent2 extends Espece{
+
+        Cent2(){
+            super(0.02,"Piece de 0.02€",1);
+        }
+        Cent2(int qt){
+            super(0.02,"Piece de 0.02€",qt);
+        }
+    }
+    public static class Cent5 extends Espece{
+
+        Cent5(){
+            super(0.05,"Piece de 0.05€",1);
+        }
+        Cent5(int qt){
+            super(0.05,"Piece de 0.05€",qt);
+        }
+    }
+    public static class Cent10 extends Espece{
+
+        Cent10(){
+            super(0.1,"Piece de 0.10€",1);
+        }
+        Cent10(int qt){
+            super(0.1,"Piece de 0.10€",qt);
+        }
+    }
+    public static class Cent20 extends Espece{
+
+        Cent20(){
+            super(0.2,"Piece de 0.20€",1);
+        }
+        Cent20(int qt){
+            super(0.2,"Piece de 0.20€",qt);
+        }
+    }
+    public static class Cent50 extends Espece{
+
+        Cent50(){
+            super(0.5,"Piece de 0.50€",1);
+        }
+        Cent50(int qt){
+            super(0.5,"Piece de 0.50€",qt);
+        }
+    }
+    public static class Piece1 extends Espece{
+
+        Piece1(){
+            super(1,"Piece de 1€",1);
+        }
+        Piece1(int qt){
+            super(1,"Piece de 1€",qt);
+        }
+    }
+
+    public static class Piece2 extends Espece{
+
+    Piece2(){
+        super(2,"Piece de 2€",1);
+    }
     Piece2(int qt){
         super(2,"Piece de 2€",qt);
     }
 }
 
-public static class Billet5 extends Espece{
+    public static class Billet5 extends Espece{
+    Billet5(){
+        super(5,"Billet de 5€",1);
+    }
     Billet5(int qt){
         super(5,"Billet de 5€",qt);
     }
 }
 
-public static class Billet10 extends Espece{
+    public static class Billet10 extends Espece{
 
+    Billet10(){
+        super(10,"Billet de 10€",1);
+    }
     Billet10(int qt){
         super(10,"Billet de 10€",qt);
     }
 }
+    public static class Billet20 extends Espece{
+
+    Billet20() {super(20,"Billet de 20€", 1);}
+    Billet20(int quantite) {super(20,"Billet de 20€", quantite);}
+}
+    public static class Billet50 extends Espece{
+        Billet50() {super(50,"Billet de 50€", 1);}
+        Billet50(int quantite) {super(50,"Billet de 50€", quantite);}
+    }
+    public static class Billet100 extends Espece{
+        Billet100() {super(100,"Billet de 100€", 1);}
+        Billet100(int quantite) {super(100,"Billet de 100€", quantite);}
+    }
+    public static class Billet200 extends Espece{
+        Billet200() {super(200,"Billet de 200€", 1);}
+        Billet200(int quantite) {super(200,"Billet de 200€", quantite);}
+    }
 
 
 public class Noeud{
     private Espece esp;
-
-    //TODO pensé lors d'un rollback à stocker dedans
     private List<String> dejaTeste;
     public Espece getEsp(){
         return esp;
@@ -135,14 +221,18 @@ Caisse(){
     public List<Noeud> decoupageMonnaie(double aDecouper){
     //ListeChaîné instanciation et sommet de l'arbre
     LinkedList<Noeud> noeuds = new LinkedList<>();
-    noeuds.add(new Noeud( new Espece(0,"0",0) {}));
+    noeuds.add(new Noeud( new Espece(0,"0",0) {
+        public String nomClass(){
+            return "Pas de solution";
+        }
+    }));
 
     //Info fonction de la situation
     int tailleListe = lesSous.size();
 
     //Variables
     boolean looping = true;
-    int valChoisie;
+    double valChoisie;
     Espece tempoCibleEsp;
     double valeurRestante = aDecouper;
 
@@ -150,8 +240,7 @@ Caisse(){
         while (looping) {
         //Boucle sur les possibilités pour chaque noeud 2,5,10
         for (int j = 0; j < tailleListe; j++) {
-            System.out.println(noeuds.stream().toList());
-
+            //System.out.println(noeuds.stream().toList());
 
             //Recup l'espece cible
             tempoCibleEsp = lesSous.get(j);
@@ -229,8 +318,8 @@ Caisse(){
         return this.especeIsIncrementable(lnoeud,esp.nomClass());
     }
 
-    public int getTotal(){
-    int ret = 0;
+    public double getTotal(){
+    double ret = 0;
         for (Espece t:lesSous)
             ret += t.getQt() * t.getValeur();
 
@@ -263,9 +352,14 @@ Caisse(){
         for (Espece esp: lesSous)
             if (unTruc.nomClass() == esp.nomClass()){
                 esp.ajouter(unTruc.qt);
-                break;
+                return;
             }
+        lesSous.add(unTruc);
+        lesSous.sort(Comparator.comparing(Espece::getValeur));
+        Collections.reverse(lesSous);
     }
+
+
     public String toString(){
         String ret ="La caisse dispose de:\n";
         for (Espece esp:lesSous) {
