@@ -73,7 +73,6 @@ public static class Billet10 extends Espece{
 
 public class Noeud{
     private Espece esp;
-    private boolean rejete = false;
 
     //TODO pensé lors d'un rollback à stocker dedans
     private List<String> dejaTeste;
@@ -140,7 +139,6 @@ Caisse(){
 
     //Info fonction de la situation
     int tailleListe = lesSous.size();
-    int nbEntiteEspece = getTotalQte();
 
     //Variables
     boolean looping = true;
@@ -148,39 +146,42 @@ Caisse(){
     Espece tempoCibleEsp;
     double valeurRestante = aDecouper;
 
-        //FIXME n'ira pas forcément a la fin de la branche car il y a dépilage transfoermer en while ?
         //Boucle sur la longueur max d'une branche
         while (looping) {
         //Boucle sur les possibilités pour chaque noeud 2,5,10
         for (int j = 0; j < tailleListe; j++) {
-            System.out.println("Boucle");
+            System.out.println(noeuds.stream().toList());
+
+
             //Recup l'espece cible
             tempoCibleEsp = lesSous.get(j);
 
-            //Si toutes les possibilitées on été faite alors on retire le noeud
+            //Si toutes les possibilitées on été faites alors on retire le noeud
             if (noeuds.getLast().toutIsRejete()){
-                System.out.println("tout visité");
+                //Si le somme à fait toute ses possibiltées on quite
+                if (noeuds.getLast() == noeuds.getFirst()) {
+                    looping = false;
+                    break;
+                }
                 //Remet la valeur de la monnaie retiré
                 valeurRestante += noeuds.getLast().esp.getValeur();
-                //Retir la monnaie de la liste
-                noeuds.removeLast();
+                //Retir le noeud cul de sac
+                Noeud ntmp =noeuds.removeLast();
+                //Informe le noeud parent de la décision de rejet de la branche
+                    noeuds.getLast().addRejet(ntmp.getEsp());
                 break;
             }
-            System.out.println("Reste a visiter");
-
             //Si déjà rejeté on passe à un autre type d'espece plus petit
-            if (noeuds.getLast().isRejet(tempoCibleEsp))continue;
-            System.out.println("Non rejeté");
-            //si pas disponible dans la caisse || plus accé pour incrémenter on rejete
+            else if (noeuds.getLast().isRejet(tempoCibleEsp))continue;
+
+            //si pas disponible dans la caisse || plus accés pour incrémenter on rejete
             if (tempoCibleEsp.getQt() == 0 || !especeIsIncrementable(noeuds,tempoCibleEsp)) {
-                noeuds.getLast().isRejet(tempoCibleEsp);
+                noeuds.getLast().addRejet(tempoCibleEsp);
                 continue;
             }
-            System.out.println("Incrémentable");
 
             //Recup valeur de la monnaie
             valChoisie = tempoCibleEsp.getValeur();
-
 
             //Si valeurRestante - choisie < 0 alors on quite et on marque comme rejeté 
             if (valeurRestante - valChoisie < 0) {
@@ -200,24 +201,15 @@ Caisse(){
                 looping = false;
                 break;
             }
-
-            //TODO SI tou visité pour le sommet alors pas de solution
-            //SI linkedList vide alors pas de solution
-            if(noeuds.isEmpty() )
-                System.err.println("Pas de modèels");
-            else if (false) {
-
-            }
-
-            //TODO liste chaîné avec les élément Espece, lorsque l'on est bloqué dans la branche on recule d'un cran en se souvenant du pressédent résultat pour prendre une valeur plus à droite (plus faible)
-            // et si tt est utilisé on remonte d'un cran et idem jusqu'à trouvé une solution ou bien jusqu'à arrivé sur un non solvable
             }//For
-        //looping = false;
     }//While
 
-        //Possible de mettre une autre monnaie ? Si oui alors on prend la plus grande, y a-t-il suffisament de monnaie ?
+        //Si unmodèle existe on retir le sommet qui ne sert plus
+        if (noeuds.size() > 1) noeuds.removeFirst();
+
         return noeuds.stream().toList();
     }//Methode
+
     /**
      * Reoturn true si il y a moins d'espece utilisé que disponible avec (utilisé < dispo )
      * */
