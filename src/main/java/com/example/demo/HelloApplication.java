@@ -15,10 +15,11 @@ public class HelloApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
-        Caisse a = new Caisse();
-        a.decoupageMonnaie(10);
-        a.ajouter(new Caisse.Billet5(2));
-        System.out.println(a);
+        Caisse laPetiteCaisse = new Caisse();
+        laPetiteCaisse.ajouter(new Caisse.Billet5(2));
+        laPetiteCaisse.ajouter(new Caisse.Billet10(2));
+        System.out.println(laPetiteCaisse.decoupageMonnaie(20));
+        System.out.println(laPetiteCaisse);
     }
 
     public static void main(String[] args) {
