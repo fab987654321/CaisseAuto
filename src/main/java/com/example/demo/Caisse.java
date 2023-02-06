@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Caisse {
@@ -34,6 +35,9 @@ public static abstract class Espece{
         valeur = val;
         description = des;
         qt = quantite;
+    }
+    public String nomClass(){
+        return this.getClass().getSimpleName();
     }
     //Methodes
     public void ajouter(int quantitee){
@@ -71,28 +75,35 @@ public class Noeud{
     private boolean rejete = false;
 
     //TODO pensé lors d'un rollback à stocker dedans
-    private List<Noeud> dejaTeste;
+    private List<String> dejaTeste;
     public Espece getEsp(){
         return esp;
     }
 
-    /** Savoir si valeur noeud déjà testé */
-    public boolean isTeste(String className){
+    /** Savoir si le type a déjà été testé (tupe espece) déjà testé */
+    public boolean isRejet(String className){
         boolean ret = false;
-        for (Noeud nunu: dejaTeste)
-            if (nunu.getEsp().getClass().getSimpleName() == className)
+        for (String nunu: dejaTeste)
+            if (nunu == className) {
                 ret = true;
+                break;
+            }
 
         return ret;
-
+    }
+    public boolean isRejet(Espece esp){
+     return this.isRejet(esp.nomClass());
     }
 
     /**Ajoute un noeud au rejeté pour avoir une trace*/
-    public void addRejet(Noeud noeudEnfant){
-        this.dejaTeste.add(noeudEnfant);
+    public void addRejet(String nomClass){
+        this.dejaTeste.add(nomClass);
+    }
+    public void addRejet(Espece esp){
+        this.addRejet(esp.nomClass());
     }
 
-    Noeud(Espece e){this.esp = e; ;}
+    Noeud(Espece e){this.esp = e; this.dejaTeste = new ArrayList<>();}
 
 }
 
@@ -107,58 +118,91 @@ Caisse(){
     lesSous.add(new Piece2(0));
 }
     public void decoupageMonnaie(double aDecouper){
-    //ListeChaîné
-    Noeud noeuds;
+    //ListeChaîné instanciation et sommet de l'arbre
+    LinkedList<Noeud> noeuds = new LinkedList<>();
+    noeuds.add(new Noeud(null));
 
     //Info fonction de la situation
     int tailleListe = lesSous.size();
     int nbEspece = getTotalQte();
 
-    //Variables temporaire qui varient bcp
-    int choisie;
+    //Variables
+    boolean looping = true;
+    int valChoisie;
+    Espece tempoCibleEsp;
     double valeurRestante = aDecouper;
 
         //FIXME n'ira pas forcément a la fin de la branche car il y a dépilage transfoermer en while ?
         //Boucle sur la longueur max d'une branche
-        for (int i = 0; i < nbEspece; i++) {
-        //Boucle sur les possibilités
+        while (looping) {
+        //Boucle sur les possibilités pour chaque noeud 2,5,10
         for (int j = 0; j < tailleListe; j++) {
-            //TODO avec la linkedList.get() ou un truc du genre
-            //Si déjà rejeté on passe à une autre sous banche
-            if (false)continue;
+            //Recup l'espece cible
+            tempoCibleEsp = lesSous.get(j);
 
-            //Recup valeur de notre potentiel piece/billet
-            choisie = lesSous.get(j).getValeur();
+            //Si déjà rejeté on passe à un autre type d'espece plus petit
+            if (noeuds.getLast().isRejet(tempoCibleEsp))continue;
+            //si pas disponible dans la caisse || plus accé pour incrémenter on rejete
+            else if (tempoCibleEsp.getQt() == 0 || especeIsIncrementable(noeuds,tempoCibleEsp)) {
+                noeuds.getLast().isRejet(tempoCibleEsp);
+                continue;
+            }
+
+            //Recup valeur de la monnaie
+            valChoisie = tempoCibleEsp.getValeur();
+
 
             //Si valeurRestante - choisie < 0 alors on quite et on marque comme rejeté 
-            if (valeurRestante - choisie < 0) {
-                //Marquer comme rejeté
-                //Dépiler de la liste chaîné
+            if (valeurRestante - valChoisie < 0) {
+                noeuds.getLast().addRejet(tempoCibleEsp);
+                continue;
             }
             //Si valeurRestante - choisie > 0 et pas de possibilité en suite car pas de disponible alors on quite et on marque comme rejeté
-            if(false){
+            else if(false){
                 //TODO a voir si ça se fait pas lors de la prochaine boucle
             }
-            //Si espece choisie plus en quantité suffisante alors on rejete
-            if(false){
-                //A voir si on fusionne pas avec un autre if a par pour mettre des msg d'erreur
+            //Si valeurRestante - valChoisie == 0 alors solution trouvé, on quite tt car solution la plus à gauche possible
+            else if (valeurRestante - valChoisie == 0) {
+                noeuds.add(new Noeud(tempoCibleEsp));
+                looping = false;
+                break;
             }
+
+            //Si la linkedList est vide alors ya pas de solution
+            //SI tou visité pour le sommet alors pas de solution
             //Attention si le premier est dépilé alors ce pb est non solvable avec notre état actuel
             if(false){
-                //SI la linkedList est vide alors ya pas de solution donc on retourne une erreur
+                //retourne une erreur/msg
             }
             //TODO liste chaîné avec les élément Espece, lorsque l'on est bloqué dans la branche on recule d'un cran en se souvenant du pressédent résultat pour prendre une valeur plus à droite (plus faible)
             // et si tt est utilisé on remonte d'un cran et idem jusqu'à trouvé une solution ou bien jusqu'à arrivé sur un non solvable
-            }
+            }//For
+            looping = false;
 
-
-    }
+    }//While
 
             //Possible de mettre une autre monnaie ? Si oui alors on prend la plus grande, y a-t-il suffisament de monnaie ?
 
+    }//Methode
+    /**
+     * Reoturn true si il y a moins d'espece utilisé que disponible avec (utilisé < dispo )
+     * */
+    private boolean especeIsIncrementable(LinkedList<Noeud> lnoeud, String nomClass){
+    boolean ret = false;
+    int nbElement = 0;
+        for (Noeud noued:lnoeud)
+             if (noued.esp.nomClass() == nomClass) nbElement++;
 
-        //
+        if (getTotalQte() > nbElement)
+            ret = true;
+
+    return ret;
     }
+
+    private boolean especeIsIncrementable(LinkedList<Noeud> lnoeud, Espece esp){
+        return this.especeIsIncrementable(lnoeud,esp.nomClass());
+    }
+
     public int getTotal(){
     int ret = 0;
         for (Espece t:lesSous)
@@ -177,7 +221,7 @@ Caisse(){
 
     public void ajouter(Espece unTruc){
         for (Espece esp: lesSous)
-            if (unTruc.getClass().getSimpleName() == esp.getClass().getSimpleName()){
+            if (unTruc.nomClass() == esp.nomClass()){
                 esp.ajouter(unTruc.qt);
                 break;
             }
