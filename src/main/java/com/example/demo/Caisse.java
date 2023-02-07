@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Caisse extends Thread{
@@ -192,6 +194,17 @@ public class Noeud{
 
         return ret;
     }
+    /**
+     * Compare avec les éléments possible en prennant en compte de décalage (par la gauche vers la droite) et si tous présent dans rejeté alors retourne vrai
+     * @return vrai si tout à été rejeté
+     */
+    public boolean toutIsRejete(int decal){
+        boolean ret = false;
+        if (dejaTeste.size() + decal == lesSous.size())
+            ret = true;
+
+        return ret;
+    }
 
     /**Ajoute un noeud au rejeté pour avoir une trace*/
     public void addRejet(String nomClass){
@@ -214,18 +227,18 @@ Caisse(){
     lesSous= new ArrayList<>();
     //Definie les valeurs de base et ce qu'elle accepte comme entité
     //Attention le sens d'ajout détermine la "prioritée" lors du parcours
-    lesSous.add(new Billet10(0));
-    lesSous.add(new Billet5(0));
-    lesSous.add(new Piece2(0));
+    //lesSous.add(new Billet10(0));
+    //lesSous.add(new Billet5(0));
+    //lesSous.add(new Piece2(0));
 }
     public List<Noeud> decoupageMonnaie(double aDecouper){
-    //ListeChaîné instanciation et sommet de l'arbre
+    long tempsDeCalcul = System.currentTimeMillis();
+
+        //ListeChaîné instanciation et sommet de l'arbre
     LinkedList<Noeud> noeuds = new LinkedList<>();
-    noeuds.add(new Noeud( new Espece(0,"0",0) {
-        public String nomClass(){
+    noeuds.add(new Noeud( new Espece(0,"0",0) {public String nomClass(){
             return "Pas de solution";
-        }
-    }));
+        }}));
 
     //Info fonction de la situation
     int tailleListe = lesSous.size();
@@ -234,30 +247,50 @@ Caisse(){
     boolean looping = true;
     double valChoisie;
     Espece tempoCibleEsp;
-    double valeurRestante = aDecouper;
+    double valeurRestante = Math.round(aDecouper*100.0)/100.0;
+    int decalage = 0;
+
+    //FICHIER pour les logs
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter("logs.txt");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        writer.println("------------------");
+
+
 
         //Boucle sur la longueur max d'une branche
         while (looping) {
+            //writer.println(noeuds.stream().toList());
+            //System.out.println(lesSous.indexOf(noeuds.getLast().getEsp()));
+            //Recup pos type d'espece pour effectuer le décalage
+            decalage = (lesSous.indexOf(noeuds.getLast().getEsp()) > 0)? (lesSous.indexOf(noeuds.getLast().getEsp()))-1: 0;
+
         //Boucle sur les possibilités pour chaque noeud 2,5,10
         for (int j = 0; j < tailleListe; j++) {
-            //System.out.println(noeuds.stream().toList());
 
-            //Recup l'espece cible
-            tempoCibleEsp = lesSous.get(j);
+            //Si le décalge et j nouss font sortir de la lsite alors on arrête de boucler
+            if (j + decalage >= lesSous.size())
+                break;
 
-            //Si toutes les possibilitées on été faites alors on retire le noeud
-            if (noeuds.getLast().toutIsRejete()){
+            //Recup type d'espece à tester
+            tempoCibleEsp = lesSous.get(j + decalage) ;
+
+            //Si toutes les possibilitées on été faites alors on retire le noeud //TODO verifier que ça fonctionne bien avec le décalage
+            if (noeuds.getLast().toutIsRejete(decalage)){
                 //Si le somme à fait toute ses possibiltées on quite
-                if (noeuds.getLast() == noeuds.getFirst()) {
+                if (noeuds.getLast() == noeuds.getFirst())
                     looping = false;
-                    break;
-                }
-                //Remet la valeur de la monnaie retiré
-                valeurRestante += noeuds.getLast().esp.getValeur();
-                //Retir le noeud cul de sac
-                Noeud ntmp =noeuds.removeLast();
-                //Informe le noeud parent de la décision de rejet de la branche
+                else {
+                    //Remet la valeur de la monnaie retiré
+                    valeurRestante += Math.round(noeuds.getLast().esp.getValeur()*100.0)/100.0;
+                    //Retir le noeud cul de sac
+                    Noeud ntmp = noeuds.removeLast();
+                    //Informe le noeud parent de la décision de rejet de la branche
                     noeuds.getLast().addRejet(ntmp.getEsp());
+                }
                 break;
             }
             //Si déjà rejeté on passe à un autre type d'espece plus petit
@@ -270,37 +303,53 @@ Caisse(){
             }
 
             //Recup valeur de la monnaie
-            valChoisie = tempoCibleEsp.getValeur();
+            valChoisie = Math.round(tempoCibleEsp.getValeur()*100.0)/100.0;
 
-            //Si valeurRestante - choisie < 0 alors on quite et on marque comme rejeté 
-            if (valeurRestante - valChoisie < 0) {
-                noeuds.getLast().addRejet(tempoCibleEsp);
-                continue;
-            }
-            //Si valeurRestante - choisie > 0 on ajoute a la linkedList et on break
-            else if(valeurRestante - valChoisie > 0){
-                noeuds.add(new Noeud(tempoCibleEsp));
-                valeurRestante -= valChoisie;
-                break;
-            }
+
             //Si valeurRestante - valChoisie == 0 alors solution trouvé, on quite tt car solution la plus à gauche possible
-            else if (valeurRestante - valChoisie == 0) {
+            //else if ((valeurRestante - valChoisie)%.2F == 0.00) {
+            if ( -0.009 < (valeurRestante - valChoisie) && (valeurRestante - valChoisie) < 0.009)  {
+                //writer.println(eccritLogCalcul(" ==0 ",valeurRestante,valChoisie));
+
                 noeuds.add(new Noeud(tempoCibleEsp));
                 valeurRestante -= valChoisie;
                 looping = false;
                 break;
             }
+            //Si valeurRestante - choisie < 0 alors on quite et on marque comme rejeté 
+           else if ((valeurRestante - valChoisie)%.2F < 0.00) {
+               //writer.println(eccritLogCalcul(" <0 ",valeurRestante,valChoisie));
+
+                noeuds.getLast().addRejet(tempoCibleEsp);
+                continue;
+            }
+            //Si valeurRestante - choisie > 0 on ajoute a la linkedList et on break
+            else if((valeurRestante - valChoisie)%.2F > 0.00){
+                //writer.println(eccritLogCalcul(" >0 ",valeurRestante,valChoisie));
+
+                noeuds.add(new Noeud(tempoCibleEsp));
+                valeurRestante -= valChoisie;
+                break;
+            }
+
             }//For
     }//While
 
         //Si unmodèle existe on retir le sommet qui ne sert plus
         if (noeuds.size() > 1) noeuds.removeFirst();
 
+        System.out.println("Temps de calcul pour:"+aDecouper+"::"+(System.currentTimeMillis() - tempsDeCalcul) + "ms");
+
+        writer.println(noeuds.stream().toList());
+        writer.close();
         return noeuds.stream().toList();
     }//Methode
 
+    private String eccritLogCalcul(String msg,double valeurRestante,double valChoisie ){
+        return (String)((valeurRestante%.2F - valChoisie%.2F)%.2F+msg+ " : "+valChoisie%.2F);
+    }
     /**
-     * Reoturn true si il y a moins d'espece utilisé que disponible avec (utilisé < dispo )
+     * Return true si il y a moins d'espece utilisé que disponible avec (utilisé < dispo )
      * */
     private boolean especeIsIncrementable(LinkedList<Noeud> lnoeud, String nomClass){
     boolean ret = false;

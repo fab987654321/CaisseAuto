@@ -19,10 +19,10 @@ public class HelloApplication extends Application {
         //Gestion de la monnaie
         Caisse laPetiteCaisse = new Caisse();
         //Centimes
-        //laPetiteCaisse.ajouter(new Caisse.Cent1(25));
-        //laPetiteCaisse.ajouter(new Caisse.Cent2(5));
-        //laPetiteCaisse.ajouter(new Caisse.Cent5(5));
-        laPetiteCaisse.ajouter(new Caisse.Cent10(0));
+        laPetiteCaisse.ajouter(new Caisse.Cent1(1));
+        laPetiteCaisse.ajouter(new Caisse.Cent2(1));
+        laPetiteCaisse.ajouter(new Caisse.Cent5(0));
+        laPetiteCaisse.ajouter(new Caisse.Cent10(6));
         laPetiteCaisse.ajouter(new Caisse.Cent20(2));
         laPetiteCaisse.ajouter(new Caisse.Cent50(6));
 
@@ -32,17 +32,21 @@ public class HelloApplication extends Application {
 
         //Billets
         laPetiteCaisse.ajouter(new Caisse.Billet5(2));
-        laPetiteCaisse.ajouter(new Caisse.Billet10(1));
-        laPetiteCaisse.ajouter(new Caisse.Billet100(1));
-        laPetiteCaisse.ajouter(new Caisse.Billet200(1));
+        laPetiteCaisse.ajouter(new Caisse.Billet10(7));
+        laPetiteCaisse.ajouter(new Caisse.Billet20());
+        laPetiteCaisse.ajouter(new Caisse.Billet50(2));
+        laPetiteCaisse.ajouter(new Caisse.Billet100());
+        laPetiteCaisse.ajouter(new Caisse.Billet200());
 
         //Traitement
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(126));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(Math.random()*100));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(Math.random()*100));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(Math.random()*100));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(Math.random()*100));
-        //System.out.println(laPetiteCaisse);
+        System.out.println(laPetiteCaisse.decoupageMonnaie(126));
+        System.out.println(laPetiteCaisse.decoupageMonnaie(126.2));
+        //System.out.println(laPetiteCaisse.decoupageMonnaie(126.35));
+        //System.out.println(laPetiteCaisse.decoupageMonnaie(32.26));
+        //System.out.println(laPetiteCaisse.decoupageMonnaie(2.65));
+        System.out.println(laPetiteCaisse.decoupageMonnaie(8.21));
+        //System.out.println(laPetiteCaisse.decoupageMonnaie(8.25));
+        System.out.println(laPetiteCaisse);
     }
 
     public static void main(String[] args) {
