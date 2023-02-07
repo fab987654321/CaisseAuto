@@ -38,6 +38,8 @@ public class HelloApplication extends Application {
         laPetiteCaisse.ajouter(new Caisse.Billet100());
         laPetiteCaisse.ajouter(new Caisse.Billet200());
 
+
+        laPetiteCaisse.decoupageArgent(1.91);
         //Traitement
         System.out.println(laPetiteCaisse.decoupageMonnaie(126));
         System.out.println(laPetiteCaisse.decoupageMonnaie(126.2));

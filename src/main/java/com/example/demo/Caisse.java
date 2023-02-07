@@ -113,7 +113,6 @@ public static abstract class Espece{
             super(1,"Piece de 1€",qt);
         }
     }
-
     public static class Piece2 extends Espece{
 
     Piece2(){
@@ -123,7 +122,6 @@ public static abstract class Espece{
         super(2,"Piece de 2€",qt);
     }
 }
-
     public static class Billet5 extends Espece{
     Billet5(){
         super(5,"Billet de 5€",1);
@@ -132,7 +130,6 @@ public static abstract class Espece{
         super(5,"Billet de 5€",qt);
     }
 }
-
     public static class Billet10 extends Espece{
 
     Billet10(){
@@ -220,7 +217,6 @@ public class Noeud{
         return this.esp.nomClass();
     }
 }
-
     private List<Espece> lesSous;
 
 Caisse(){
@@ -236,9 +232,7 @@ Caisse(){
 
         //ListeChaîné instanciation et sommet de l'arbre
     LinkedList<Noeud> noeuds = new LinkedList<>();
-    noeuds.add(new Noeud( new Espece(0,"0",0) {public String nomClass(){
-            return "Pas de solution";
-        }}));
+    noeuds.add(new Noeud( new Espece(0,"0",0) {public String nomClass(){return "Pas de solution";}}));
 
     //Info fonction de la situation
     int tailleListe = lesSous.size();
@@ -278,7 +272,7 @@ Caisse(){
             //Recup type d'espece à tester
             tempoCibleEsp = lesSous.get(j + decalage) ;
 
-            //Si toutes les possibilitées on été faites alors on retire le noeud //TODO verifier que ça fonctionne bien avec le décalage
+            //Si toutes les possibilitées on été faites alors on retire le noeud
             if (noeuds.getLast().toutIsRejete(decalage)){
                 //Si le somme à fait toute ses possibiltées on quite
                 if (noeuds.getLast() == noeuds.getFirst())
@@ -338,12 +332,58 @@ Caisse(){
         //Si unmodèle existe on retir le sommet qui ne sert plus
         if (noeuds.size() > 1) noeuds.removeFirst();
 
-        System.out.println("Temps de calcul pour:"+aDecouper+"::"+(System.currentTimeMillis() - tempsDeCalcul) + "ms");
+        System.out.println("Temps de calcul pour:"+(float)aDecouper+"::"+(System.currentTimeMillis() - tempsDeCalcul) + "ms");
 
         writer.println(noeuds.stream().toList());
         writer.close();
         return noeuds.stream().toList();
     }//Methode
+
+    public List<Noeud> decoupageArgent(double aDecouper){
+    List<Noeud> lCent = this.decoupageCent(aDecouper);
+    List<Noeud> lEuros ;
+    List<Noeud> ret = new ArrayList<>();
+
+
+    //Si découpage possible
+    if (lCent.size() > 0) {
+        //Retirer de la caisse les centimes utilisés
+        for (Noeud n:lCent)
+            this.retirer(n.getEsp());
+
+        lEuros = this.decoupageEuro(aDecouper);
+        //Si découpage impossible alors on remet les centimes
+        if (!(lCent.size() > 0)) {
+            for (Noeud n : lCent)
+                this.ajouter(n.getEsp());
+
+            ret.add(new Noeud( new Espece(0,"0",0) {public String nomClass(){return "Pas de solution";}}));
+        }
+        else {
+            ret.addAll(lEuros);
+            ret.addAll(lCent);
+        }
+
+
+    }
+
+    return ret;
+    }
+    public List<Noeud> decoupageCent(double aDecouper) {
+        return  this.decoupageMonnaie( aDecouper - (int)aDecouper);
+    }
+
+    public List<Noeud> decoupageEuro(double aDecouper) {
+        aDecouper = (int)aDecouper;
+        List<Noeud> ret = new ArrayList<>();
+
+
+
+
+
+        return ret;
+    }
+
 
     private String eccritLogCalcul(String msg,double valeurRestante,double valChoisie ){
         return (String)((valeurRestante%.2F - valChoisie%.2F)%.2F+msg+ " : "+valChoisie%.2F);
@@ -397,6 +437,7 @@ Caisse(){
     }
     public int getTotalQte(Espece esp){return this.getTotalQte(esp.nomClass());}
 
+    /*Ajoute des especes à la caisse */
     public void ajouter(Espece unTruc){
         for (Espece esp: lesSous)
             if (unTruc.nomClass() == esp.nomClass()){
@@ -408,11 +449,20 @@ Caisse(){
         Collections.reverse(lesSous);
     }
 
+    /** Retire de la monnaie de la caisse
+     * @TODO thows erreur: QT inf à 0, espece inexistante */
+    public void retirer(Espece esp){
+        for (Espece t:lesSous)
+            if (esp.nomClass() == t.nomClass()){
+                t.setQt(t.getQt() - esp.getQt());
+                break;
+            }
+    }
 
     public String toString(){
         String ret ="La caisse dispose de:\n";
         for (Espece esp:lesSous) {
-            ret += esp.getDescription() + ":" + esp.getQt() + " // " + esp.getQt() * esp.getValeur() + "\n";
+            ret += esp.getDescription() + ":" + esp.getQt() + " // " + (float)(esp.getQt() * esp.getValeur()) + "\n";
         }
         ret += "Pour un total de: " + this.getTotal() +"€ \n";
                 
