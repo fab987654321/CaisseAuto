@@ -329,7 +329,7 @@ Caisse(){
             }//For
     }//While
 
-        //Si unmodèle existe on retir le sommet qui ne sert plus
+        //Si un modèle existe on retir le sommet qui ne sert plus
         if (noeuds.size() > 1) noeuds.removeFirst();
 
         System.out.println("Temps de calcul pour:"+(float)aDecouper+"::"+(System.currentTimeMillis() - tempsDeCalcul) + "ms");
@@ -345,26 +345,34 @@ Caisse(){
     List<Noeud> ret = new ArrayList<>();
 
 
-    //Si découpage possible
-    if (lCent.size() > 0) {
+    //Si découpage des centimes possible
+    if (lCent.get(0).getEsp().getValeur() != 0) {
         //Retirer de la caisse les centimes utilisés
         for (Noeud n:lCent)
             this.retirer(n.getEsp());
 
         lEuros = this.decoupageEuro(aDecouper);
-        //Si découpage impossible alors on remet les centimes
-        if (!(lCent.size() > 0)) {
+        //Si découpage impossible alors on remet les centimes dans la caisse
+        if (lEuros.get(0).getEsp().getValeur() == 0) {
             for (Noeud n : lCent)
                 this.ajouter(n.getEsp());
 
             ret.add(new Noeud( new Espece(0,"0",0) {public String nomClass(){return "Pas de solution";}}));
         }
         else {
+            /*
+            //Retirer les Euros
+            for (Noeud n : lEuros)
+                this.retirer(n.getEsp());
+            */
+            //Ajouter a la liste à retourner
             ret.addAll(lEuros);
             ret.addAll(lCent);
         }
 
 
+    }else {
+        ret = lCent;
     }
 
     return ret;
@@ -374,14 +382,7 @@ Caisse(){
     }
 
     public List<Noeud> decoupageEuro(double aDecouper) {
-        aDecouper = (int)aDecouper;
-        List<Noeud> ret = new ArrayList<>();
-
-
-
-
-
-        return ret;
+        return  this.decoupageMonnaie((int)aDecouper);
     }
 
 

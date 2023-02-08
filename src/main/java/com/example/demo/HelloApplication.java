@@ -39,15 +39,18 @@ public class HelloApplication extends Application {
         laPetiteCaisse.ajouter(new Caisse.Billet200());
 
 
-        laPetiteCaisse.decoupageArgent(1.91);
+        System.out.println(laPetiteCaisse.decoupageArgent(121.95));
+
         //Traitement
-        System.out.println(laPetiteCaisse.decoupageMonnaie(126));
-        System.out.println(laPetiteCaisse.decoupageMonnaie(126.2));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(126.35));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(32.26));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(2.65));
-        System.out.println(laPetiteCaisse.decoupageMonnaie(8.21));
-        //System.out.println(laPetiteCaisse.decoupageMonnaie(8.25));
+        System.out.println(laPetiteCaisse.decoupageArgent(126));
+        System.out.println(laPetiteCaisse.decoupageArgent(126.2));
+        System.out.println(laPetiteCaisse.decoupageArgent(126.35));
+        System.out.println(laPetiteCaisse.decoupageArgent(32.26));
+        System.out.println(laPetiteCaisse.decoupageArgent(2.65));
+        System.out.println(laPetiteCaisse.decoupageArgent(8.21));
+        System.out.println(laPetiteCaisse.decoupageArgent(8.25));
+
+
         System.out.println(laPetiteCaisse);
     }
 
