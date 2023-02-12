@@ -4,6 +4,8 @@ import com.example.demo.espece.*;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Caisse extends Thread{
@@ -176,10 +178,29 @@ public class Caisse extends Thread{
     }//Methode
 
     public List<Noeud> decoupageArgent(double aDecouper){
-        List<Espece> cpSous = new ArrayList<>(this.lesSous);
+        List<Espece> cpSous = new ArrayList<>();
+        ///////// Pour "cloner" la liste sans conserver la même référence
+        try {
+            Class clasz;
+            Constructor constructor;
+        for (Espece esp : this.lesSous) {
+            //Recup de la classe
+            clasz = Class.forName(esp.getClass().getName());
+            //Recup d'un constructeur qui correspond a ce type d'arg
+            constructor = clasz.getConstructor(new Class[]{int.class});
+            //Ajoute l'obj à la liste avec le bon nombre d'élement dans la liste
+            cpSous.add((Espece) constructor.newInstance(esp.getQt()));
+        }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            //@TODO faire un truc un peu mieux au nivea ude la gestion des pb
+            throw new RuntimeException(e);
+        }
+        /////////
         List<Noeud> lCent = this.decoupageCent(aDecouper,cpSous);
-        List<Noeud> lEuros ;
+        List<Noeud> lEuros;
         List<Noeud> ret = new ArrayList<>();
+
 
         //Cas où supérieur à 0
         if (aDecouper > 0.0) {

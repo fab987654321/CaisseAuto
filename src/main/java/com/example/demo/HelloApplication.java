@@ -40,6 +40,7 @@ public class HelloApplication extends Application {
         laPetiteCaisse.ajouter(new Billet100());
         laPetiteCaisse.ajouter(new Billet200());
 
+        System.out.println(laPetiteCaisse);
 
         double[] valeurAtester = {121.95,126,126.35,32.26,2.65,8.21,8.25,0};
 
