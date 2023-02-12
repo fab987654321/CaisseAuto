@@ -22,7 +22,7 @@ public class HelloApplication extends Application {
         Caisse laPetiteCaisse = new Caisse();
         //Centimes
         laPetiteCaisse.ajouter(new Cent1(1));
-        laPetiteCaisse.ajouter(new Cent2(4));
+        laPetiteCaisse.ajouter(new Cent2(0));
         laPetiteCaisse.ajouter(new Cent5(0));
         laPetiteCaisse.ajouter(new Cent10(6));
         laPetiteCaisse.ajouter(new Cent20(2));

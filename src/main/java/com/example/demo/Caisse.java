@@ -205,7 +205,7 @@ public class Caisse extends Thread{
         //Cas où supérieur à 0
         if (aDecouper > 0.0) {
             //Si découpage des centimes possible
-            if (lCent.get(0).getEsp().getValeur() != 0) {
+            if (lCent.get(0).getEsp().getValeur() != 0 || (aDecouper - (int)aDecouper ) == 0) {
                 //Retirer de la caisse les centimes utilisés
                 for (Noeud n : lCent)
                     cpSous = this.retirer(n.getEsp(),cpSous);
@@ -221,7 +221,8 @@ public class Caisse extends Thread{
 
                     //Ajouter a la liste à retourner
                     ret.addAll(lEuros);
-                    ret.addAll(lCent);
+                    if ((aDecouper - (int)aDecouper ) > 0)
+                        ret.addAll(lCent);
                 }
                 //Cas "Pas de solution"
                 else
