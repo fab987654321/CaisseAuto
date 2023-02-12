@@ -1,11 +1,13 @@
 package com.example.demo;
 
+import com.example.demo.espece.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 
 public class HelloApplication extends Application {
     @Override
@@ -19,36 +21,30 @@ public class HelloApplication extends Application {
         //Gestion de la monnaie
         Caisse laPetiteCaisse = new Caisse();
         //Centimes
-        laPetiteCaisse.ajouter(new Caisse.Cent1(1));
-        laPetiteCaisse.ajouter(new Caisse.Cent2(1));
-        laPetiteCaisse.ajouter(new Caisse.Cent5(0));
-        laPetiteCaisse.ajouter(new Caisse.Cent10(6));
-        laPetiteCaisse.ajouter(new Caisse.Cent20(2));
-        laPetiteCaisse.ajouter(new Caisse.Cent50(6));
+        laPetiteCaisse.ajouter(new Cent1(1));
+        laPetiteCaisse.ajouter(new Cent2(4));
+        laPetiteCaisse.ajouter(new Cent5(0));
+        laPetiteCaisse.ajouter(new Cent10(6));
+        laPetiteCaisse.ajouter(new Cent20(2));
+        laPetiteCaisse.ajouter(new Cent50(6));
 
         //Pieces euros
-        laPetiteCaisse.ajouter(new Caisse.Piece1(3));
-        laPetiteCaisse.ajouter(new Caisse.Piece2());
+        laPetiteCaisse.ajouter(new Piece1(3));
+        laPetiteCaisse.ajouter(new Piece2());
 
         //Billets
-        laPetiteCaisse.ajouter(new Caisse.Billet5(2));
-        laPetiteCaisse.ajouter(new Caisse.Billet10(7));
-        laPetiteCaisse.ajouter(new Caisse.Billet20());
-        laPetiteCaisse.ajouter(new Caisse.Billet50(2));
-        laPetiteCaisse.ajouter(new Caisse.Billet100());
-        laPetiteCaisse.ajouter(new Caisse.Billet200());
+        laPetiteCaisse.ajouter(new Billet5(2));
+        laPetiteCaisse.ajouter(new Billet10(7));
+        laPetiteCaisse.ajouter(new Billet20());
+        laPetiteCaisse.ajouter(new Billet50(2));
+        laPetiteCaisse.ajouter(new Billet100());
+        laPetiteCaisse.ajouter(new Billet200());
 
 
-        System.out.println(laPetiteCaisse.decoupageArgent(121.95));
+        double[] valeurAtester = {121.95,126,126.35,32.26,2.65,8.21,8.25,0};
 
-        //Traitement
-        System.out.println(laPetiteCaisse.decoupageArgent(126));
-        System.out.println(laPetiteCaisse.decoupageArgent(126.2));
-        System.out.println(laPetiteCaisse.decoupageArgent(126.35));
-        System.out.println(laPetiteCaisse.decoupageArgent(32.26));
-        System.out.println(laPetiteCaisse.decoupageArgent(2.65));
-        System.out.println(laPetiteCaisse.decoupageArgent(8.21));
-        System.out.println(laPetiteCaisse.decoupageArgent(8.25));
+        for (double val:valeurAtester)
+            System.out.println(val+"::" + laPetiteCaisse.decoupageArgent(val));
 
 
         System.out.println(laPetiteCaisse);
