@@ -2,6 +2,8 @@ package com.example.demo;
 
 import com.example.demo.espece.*;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.*;
 import javafx.scene.Group;
@@ -26,22 +28,12 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         String basePath = System.getProperty("user.dir");
-        String[] lImg = {"a.png","b.png","c.png","d.png","e.png","f.png"};
+        String[] lImgMonnaie = {"1cent.png","2cent.png","5cent.png","10cent.png","20cent.png","50cent.png","1euro.png","2euro.png","5euro.png","10euro.png","20euro.png","50euro.png","100euro.png","200euro.png","500euro.png"};
+        String[] lImgAction = {"ajouter.png","retirer.png","supprimer.png"};
         List<Button> btns = new ArrayList<>();
-        ImageView tmpImgView ;
-        //Mets les images dans les boutons
-        for (String strPath:lImg) {
-            //Créer l'image
-            tmpImgView = new ImageView(basePath+"/img/"+strPath);
-            //Force la taille @TODO mettre avec un auto resize
-            tmpImgView.setFitHeight(100);
-            tmpImgView.setPreserveRatio(true);
 
-            //Créer le bouton avec l'image et le met dans la liste
-            btns.add(new Button());
-            btns.get(btns.size() -1).setGraphic(tmpImgView);
-        }
-
+        btns.addAll(imgAvecBouton(lImgMonnaie,basePath+"/img/clavier/espece/"));
+        btns.addAll(imgAvecBouton(lImgAction,basePath+"/img/clavier/action/"));
 
 
         //Creating a Grid Pane
@@ -54,7 +46,7 @@ public class HelloApplication extends Application {
         //Setting the Grid alignment
         gridPane.setAlignment(Pos.CENTER);
 
-        //Pour découper au mieux la grille
+        ////////Pour découper au mieux la grille
         //nbElements % x, chercher le plus proche de 0 (ou 0) avec 1 < x < nbElement
         HashMap<Integer, Integer> hashGrillage = new HashMap<Integer, Integer>();
         int nbElement = btns.size();
@@ -69,17 +61,15 @@ public class HelloApplication extends Application {
                 break;
         }
 
-        int maxCol = 0;
-        //Découpage des colonnes max
-        int min = Collections.min(hashGrillage.values());
-        for (Map.Entry<Integer,Integer> a:hashGrillage.entrySet())
-            if (min == a.getValue()) {
-                maxCol = a.getKey();
-                break;
-            }
+        //Recupère la plus petite valeur de la liste
+        int maxCol = hashGrillage.entrySet()
+                .stream()
+                .filter(entry -> Collections.min(hashGrillage.values()) == entry.getValue())
+                .findFirst()
+                .map(Map.Entry::getKey)
+                .orElse(0);
 
-
-
+        //Pour créer la grille
         int colonne = 0;
         int ligne = 0;
         //Ajoute les éléments à la grille
@@ -91,12 +81,14 @@ public class HelloApplication extends Application {
             gridPane.add(b,colonne,ligne);
             colonne++;
         }
+        ////////
 
+        VBox  root = new VBox ();
+        Label lMonnaie = new Label("Monnaie");
+        root.getChildren().addAll(lMonnaie,gridPane);
 
-        StackPane root = new StackPane();
-        root.getChildren().add(gridPane);
         Scene scene = new Scene(root, 1280, 720, Color.GREY);
-        primaryStage.setTitle("Button Graphics");
+        primaryStage.setTitle("Dev gestion monnaie");
         primaryStage.setScene(scene);
 
         primaryStage.show();
@@ -139,5 +131,32 @@ public class HelloApplication extends Application {
 
     public static void main(String[] args) {
         launch();
+    }
+
+    private List<Button> imgAvecBouton(String[] lImg,String Path){
+
+        List<Button> btns = new ArrayList<>();
+        ImageView tmpImgView ;
+        Button tmpButton ;
+        //Mets les images dans les boutons
+        for (String strPath:lImg) {
+            //Créer l'image
+            tmpImgView = new ImageView(Path+strPath);
+            //Force la taille @TODO mettre avec un auto resize
+            tmpImgView.setFitHeight(100);
+            tmpImgView.setPreserveRatio(true);
+
+            //Créer le bouton avec l'image et le met dans la liste
+            tmpButton = new Button();
+            tmpButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    System.out.println("Hi there! You clicked me!");
+                }
+            });
+            btns.add(tmpButton);
+            btns.get(btns.size() -1).setGraphic(tmpImgView);
+        }
+        return btns;
     }
 }
